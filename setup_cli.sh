@@ -4,21 +4,40 @@ sudo -v
 
 echo "setting up ssh keys..."
 mkdir ~/.ssh
-cp /mnt/c/Users/gusta/.ssh/gusta-xda550 ~/.ssh
-cp /mnt/c/Users/gusta/.ssh/gusta-xda550.pub ~/.ssh
 
-sudo chmod 600 ~/.ssh/gusta-xda550
-sudo chmod 600 ~/.ssh/gusta-xda550.pub
+if test -e /mnt/c/Users/gusta/.ssh/gusta-xda550; then
+	cp /mnt/c/Users/gusta/.ssh/gusta-xda550 ~/.ssh
+	cp /mnt/c/Users/gusta/.ssh/gusta-xda550.pub ~/.ssh
 
-eval $(ssh-agent -s)
-ssh-add ~/.ssh/gusta-xda550
-sleep 1
+	sudo chmod 600 ~/.ssh/gusta-xda550
+	sudo chmod 600 ~/.ssh/gusta-xda550.pub
+
+	eval $(ssh-agent -s)
+	ssh-add ~/.ssh/gusta-xda550
+	echo "ssh keys found in windows user folder"
+else
+	if test -e ~/.ssh/gusta-xda550; then
+		eval $(ssh-agent -s)
+		ssh-add ~/.ssh/gusta-xda550
+		echo "ssh keys found locally"
+	fi
+fi
+
+sudo echo "   IdentityFile ~/.ssh/gusta-xda550" >> /etc/ssh/ssh_config
+
+sleep 100
 
 echo "installing dependencies..."
 sudo apt install python3 python3-pip python-is-python3 build-essential neofetch openssh-server -y
 
-echo "installing zsh and plugins"
 sleep 1
+echo "setting up git..."
+sudo apt install git -y
+git config --global user.name "Gustavo Sousa"
+git config --global user.email "gustavosousa@alu.ufc.br"
+
+sleep 1
+echo "installing zsh and plugins"
 sudo apt install git curl zsh -y
 {
 	echo "y"
