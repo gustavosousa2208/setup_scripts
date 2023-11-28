@@ -5,30 +5,74 @@ sudo -v
 echo "setting up ssh keys..."
 mkdir ~/.ssh
 
-if test -e /mnt/c/Users/gusta/.ssh/gusta-xda550; then
-	cp /mnt/c/Users/gusta/.ssh/gusta-xda550 ~/.ssh
-	cp /mnt/c/Users/gusta/.ssh/gusta-xda550.pub ~/.ssh
+sudo find /mnt -maxdepth 3 -name "gusta-xda550" > out_teste.txt
+keys_external=$(cat out_teste.txt | grep -v "*Permission*" | sed -n 1p)
 
-	sudo chmod 600 ~/.ssh/gusta-xda550
-	sudo chmod 600 ~/.ssh/gusta-xda550.pub
+if test -e $keys_external; then
+    echo "keys found in /mnt drives"
 
-	eval $(ssh-agent -s)
-	ssh-add ~/.ssh/gusta-xda550
-	echo "ssh keys found in windows user folder"
+    cp $keys_external ~/.ssh
+    cp $keys_external.pub ~/.ssh
+
+    sudo chmod 600 ~/.ssh/gusta-xda550
+    sudo chmod 600 ~/.ssh/gusta-xda550.pub
+
+    eval $(ssh-agent -s)
+    ssh-add ~/.ssh/gusta-xda550
+
 else
-	if test -e ~/.ssh/gusta-xda550; then
-		eval $(ssh-agent -s)
-		ssh-add ~/.ssh/gusta-xda550
-		echo "ssh keys found locally"
-	fi
+    sudo find /media -maxdepth 3 -name "gusta-xda550" > out_teste.txt
+    keys_external=$(cat out_teste.txt | grep -v "*Permission*" | sed -n 1p)
+
+    if test -e $keys_external; then
+        echo "keys found in /media drives"
+
+        cp $keys_external ~/.ssh
+        cp $keys_external.pub ~/.ssh
+
+        sudo chmod 600 ~/.ssh/gusta-xda550
+        sudo chmod 600 ~/.ssh/gusta-xda550.pub
+
+        eval $(ssh-agent -s)
+        ssh-add ~/.ssh/gusta-xda550
+
+    else
+        if test -e /mnt/c/Users/gusta/.ssh/gusta-xda550; then
+            cp /mnt/c/Users/gusta/.ssh/gusta-xda550 ~/.ssh
+            cp /mnt/c/Users/gusta/.ssh/gusta-xda550.pub ~/.ssh
+
+            sudo chmod 600 ~/.ssh/gusta-xda550
+            sudo chmod 600 ~/.ssh/gusta-xda550.pub
+
+            eval $(ssh-agent -s)
+            ssh-add ~/.ssh/gusta-xda550
+            echo "ssh keys found in windows user folder"
+        else
+            if test -e ~/.ssh/gusta-xda550; then
+                eval $(ssh-agent -s)
+                ssh-add ~/.ssh/gusta-xda550
+                echo "ssh keys found locally"
+            fi
+        fi
+    fi
 fi
 
+sudo rm out_teste.txt
 sudo echo "   IdentityFile ~/.ssh/gusta-xda550" >> /etc/ssh/ssh_config
 
-sleep 100
+sleep 1
 
 echo "installing dependencies..."
-sudo apt install python3 python3-pip python-is-python3 build-essential neofetch openssh-server -y
+sudo apt install python3 python3-pip python-is-python3 build-essential neofetch openssh-server net-tools -y
+
+sleep 1 
+echo "installing neovim from source"
+git clone -j8 https://github.com/neovim/neovim
+cd neovim
+make CMAKE_BUILD_TYPE=RelWithDebInfo
+sudo make install
+cd ..
+sudo rm -rf neovim
 
 sleep 1
 echo "setting up git..."
