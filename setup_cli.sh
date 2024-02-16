@@ -66,13 +66,12 @@ echo "installing dependencies..."
 sudo apt install python3 python3-pip python-is-python3 build-essential neofetch openssh-server net-tools -y
 
 sleep 1 
-echo "installing neovim from source"
-git clone -j8 https://github.com/neovim/neovim
-cd neovim
-make CMAKE_BUILD_TYPE=RelWithDebInfo
-sudo make install
-cd ..
-sudo rm -rf neovim
+echo "installing neovim from snap"
+sudo snap install neovim --classic
+
+sleep 1
+echo "setting up clock to match windows"
+timedatectl set-local-rtc 1
 
 sleep 1
 echo "setting up git..."
