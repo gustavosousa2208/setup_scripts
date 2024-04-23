@@ -81,7 +81,7 @@ git config --global user.email "gustavosousa@alu.ufc.br"
 
 sleep 1
 echo "installing zsh and plugins"
-sudo apt install git curl zsh -y
+sudo apt install git curl zsh tmux -y
 {
 	echo "y"
 } | sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
@@ -128,6 +128,12 @@ else
 
     start_agent;
 fi
+
+# source /etc/environment, all new path is added there, at least for me
+source /etc/environment
+
+# adding tmux 
+[[ $TERM != "screen" ]] && exec tmux
 EOF
 
 sudo usermod -s $(which zsh) $USER
